@@ -21,7 +21,8 @@ RSpec.describe Account, type: :model do
     }
 
     it "should return outstanding principal for a given day" do
-      expect(account.outstanding_principal(now - 25.days)).to eq(0)
+      expect(account.outstanding_principal(now - 25.days)).to eq(300.00)
     end
+
   end
 end

@@ -18,7 +18,7 @@ class Account < ApplicationRecord
   def withdraw! amount
     amount = amount.to_f
     self.balance += amount
-    ledger = Ledger.new(account_id: self.id, entry_type: :withdraw, amount: amount)
+    ledger = Ledger.new(account_id: self.id, entry_type: :withdraw, amount: amount, balance: self.balance)
 
     ActiveRecord::Base.transaction do
       ledger.save!
@@ -29,11 +29,26 @@ class Account < ApplicationRecord
   def deposit! amount
     amount = amount.to_f
     self.balance -= amount
-    ledger = Ledger.new(account_id: self.id, entry_type: :deposit, amount: amount)
+    ledger = Ledger.new(account_id: self.id, entry_type: :deposit, amount: amount, balance: self.balance)
 
     ActiveRecord::Base.transaction do
       ledger.save!
       save!
     end
+  end
+
+  # TODO: Accept any date like param and convert to midnight
+  def outstanding_principal time=Time.now
+    time = time.midnight if time.class == Time
+
+    return self.balance if self.ledgers.empty?
+
+    last = self.ledgers.where("created_at < ?", time).order("id DESC").limit(1).first
+    return self.balance if last.nil?
+
+    last.balance
+
+    # SELECT * FROM ledgers WHERE account_id=#{id} AND created_at < #{time} ORDER BY id DESC LIMIT 1
+
   end
 end
