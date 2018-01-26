@@ -104,11 +104,11 @@ RSpec.describe AccountsController, type: :controller do
         expect(json["balance"].to_f).to eq(balance + amount)
       end
 
-      it "create transaction record" do
+      it "creates additional record in ledger" do
 
         expect {
           post :withdraw, params: { id: account.id, amount: 100.00 }
-        }.to change(Transaction, :count).by(1)
+        }.to change(Ledger, :count).by(1)
       end
     end
 
@@ -136,11 +136,11 @@ RSpec.describe AccountsController, type: :controller do
         expect(json["balance"].to_f).to eq(balance - amount)
       end
 
-      it "create transaction record" do
+      it "creates additional record in ledger" do
 
         expect {
           post :deposit, params: { id: account.id, amount: 50.00 }
-        }.to change(Transaction, :count).by(1)
+        }.to change(Ledger, :count).by(1)
       end
     end
 
