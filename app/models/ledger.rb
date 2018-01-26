@@ -3,4 +3,6 @@ class Ledger < ApplicationRecord
     withdraw: 1,
     deposit: 2
   }
+
+  belongs_to :account
 end
