@@ -1,5 +1,5 @@
 class AccountsController < ApplicationController
-  before_action :set_account, only: [:show, :update, :destroy]
+  before_action :set_account, only: [:show, :update, :destroy, :withdraw, :deposit]
 
   # GET /accounts
   def index
@@ -33,6 +33,14 @@ class AccountsController < ApplicationController
     end
   end
 
+  # PUT /accounts/1/withdraw
+  def withdraw
+  end
+
+  # PUT /accounts/1/deposit
+  def deposit
+  end
+
   # DELETE /accounts/1
   def destroy
     @account.destroy
@@ -46,6 +54,6 @@ class AccountsController < ApplicationController
 
     # Only allow a trusted parameter "white list" through.
     def account_params
-      params.require(:account).permit(:apr, :apr, :limit)
+      params.require(:account).permit(:apr, :limit)
     end
 end
