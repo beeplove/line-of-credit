@@ -33,5 +33,8 @@ RSpec.describe AccountsController, type: :routing do
       expect(:put => "/accounts/1/withdraw").to route_to("accounts#withdraw", :id => "1")
     end
 
+    it "routes to #deposit" do
+      expect(:put => "/accounts/1/deposit").to route_to("accounts#deposit", :id => "1")
+    end
   end
 end

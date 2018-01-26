@@ -42,11 +42,6 @@ RSpec.describe AccountsController, type: :controller do
     }
   }
 
-  # This should return the minimal set of values that should be in the session
-  # in order to pass any filters (e.g. authentication) defined in
-  # AccountsController. Be sure to keep this updated too.
-  let(:valid_session) { {} }
-
   # describe "GET #index" do
   #   it "returns a success response" do
   #     account = Account.create! valid_attributes
@@ -67,13 +62,13 @@ RSpec.describe AccountsController, type: :controller do
     context "with valid params" do
       it "creates a new Account" do
         expect {
-          post :create, params: {account: valid_attributes}, session: valid_session
+          post :create, params: {account: valid_attributes}
         }.to change(Account, :count).by(1)
       end
 
       it "renders a JSON response with the new account" do
 
-        post :create, params: {account: valid_attributes}, session: valid_session
+        post :create, params: {account: valid_attributes}
         expect(response).to have_http_status(:created)
         expect(response.content_type).to eq('application/json')
         expect(response.location).to eq(account_url(Account.last))
@@ -83,7 +78,7 @@ RSpec.describe AccountsController, type: :controller do
     context "with invalid params" do
       it "renders a JSON response with errors for the new account" do
 
-        post :create, params: {account: invalid_attributes}, session: valid_session
+        post :create, params: {account: invalid_attributes}
         expect(response).to have_http_status(:unprocessable_entity)
         expect(response.content_type).to eq('application/json')
       end
@@ -91,8 +86,20 @@ RSpec.describe AccountsController, type: :controller do
   end
 
   describe "PUT #withdraw" do
-    context "with valid params" do
+    let(:account) {
+      post :create, params: {account: valid_attributes}
+      Account.last
+    }
 
+    context "with valid params" do
+      it "update balance" do
+        balance = account.balance
+        amount = 100.00
+        post :withdraw, params: { id: account.id, amount: amount }
+        expect(response).to have_http_status(:ok)
+        expect(response.content_type).to eq('application/json')
+        expect(account.balance).to eq(balance - amount)
+      end
     end
 
     context "with valid params" do
