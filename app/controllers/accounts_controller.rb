@@ -35,6 +35,11 @@ class AccountsController < ApplicationController
 
   # PUT /accounts/1/withdraw
   def withdraw
+    if @account.withdraw!(params[:amount])
+      render json: @account, status: :ok
+    else
+      render json: @account.errors, status: :unprocessable_entity
+    end
   end
 
   # PUT /accounts/1/deposit

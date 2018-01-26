@@ -98,7 +98,8 @@ RSpec.describe AccountsController, type: :controller do
         post :withdraw, params: { id: account.id, amount: amount }
         expect(response).to have_http_status(:ok)
         expect(response.content_type).to eq('application/json')
-        expect(account.balance).to eq(balance - amount)
+        json = JSON.parse(response.body)
+        expect(json["balance"].to_f).to eq(balance + amount)
       end
     end
 

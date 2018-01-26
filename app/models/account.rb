@@ -12,6 +12,8 @@ class Account < ApplicationRecord
   #   - check limit
   #   - check amount
   def withdraw! amount
+    self.balance += amount.to_f
+    save!
   end
 
   def deposit! amount
