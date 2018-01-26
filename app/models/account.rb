@@ -7,17 +7,19 @@ class Account < ApplicationRecord
 
   # TODO: check if we want to set a maximum in one transaction
 
-
-  # TODO:
+  #
+  # TODO: (for withdraw! and deposit!)
   #   - check limit
   #   - check amount
   #   - create transaction record
+  #
   def withdraw! amount
     self.balance += amount.to_f
     save!
   end
 
   def deposit! amount
-
+    self.balance -= amount.to_f
+    save!
   end
 end

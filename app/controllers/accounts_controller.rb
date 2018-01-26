@@ -44,6 +44,11 @@ class AccountsController < ApplicationController
 
   # PUT /accounts/1/deposit
   def deposit
+    if @account.deposit!(params[:amount])
+      render json: @account, status: :ok
+    else
+      render json: @account.errors, status: :unprocessable_entity
+    end
   end
 
   # DELETE /accounts/1
