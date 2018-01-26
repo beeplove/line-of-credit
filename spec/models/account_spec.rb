@@ -3,11 +3,9 @@ require 'rails_helper'
 RSpec.describe Account, type: :model do
 
   describe "#withdraw" do
-
   end
 
   describe "#deposit" do
-
   end
 
   describe "#outstanding_principal" do
@@ -23,7 +21,7 @@ RSpec.describe Account, type: :model do
     }
 
     it "should return outstanding principal for a given day" do
-      expect(a.outstanding_principal(t - 25.days)).to eq(0)
+      expect(account.outstanding_principal(now - 25.days)).to eq(0)
     end
   end
 end
