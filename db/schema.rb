@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180126045003) do
+ActiveRecord::Schema.define(version: 20180126055416) do
 
   create_table "accounts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.decimal "apr", precision: 5, scale: 2
@@ -18,6 +18,15 @@ ActiveRecord::Schema.define(version: 20180126045003) do
     t.decimal "balance", precision: 9, scale: 2, default: "0.0"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "ledgers", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.bigint "account_id"
+    t.integer "entry_type", null: false
+    t.decimal "amount", precision: 9, scale: 2, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_ledgers_on_account_id"
   end
 
 end
