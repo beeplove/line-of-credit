@@ -101,6 +101,12 @@ RSpec.describe AccountsController, type: :controller do
         json = JSON.parse(response.body)
         expect(json["balance"].to_f).to eq(balance + amount)
       end
+
+      it "create transaction record" do
+        expect {
+          post :withdraw, params: { id: account.id, amount: 100.00 }
+        }.to change(Transaction, :count).by(1)
+      end
     end
 
     context "with invalid params" do
@@ -119,11 +125,18 @@ RSpec.describe AccountsController, type: :controller do
       it "update balance" do
         balance = account.balance
         amount = 50.00
+
         post :deposit, params: { id: account.id, amount: amount }
         expect(response).to have_http_status(:ok)
         expect(response.content_type).to eq('application/json')
         json = JSON.parse(response.body)
         expect(json["balance"].to_f).to eq(balance - amount)
+      end
+
+      it "create transaction record" do
+        expect {
+          post :deposit, params: { id: account.id, amount: 50.00 }
+        }.to change(Transaction, :count).by(1)
       end
     end
 
