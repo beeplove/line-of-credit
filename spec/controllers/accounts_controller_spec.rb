@@ -90,6 +90,27 @@ RSpec.describe AccountsController, type: :controller do
     end
   end
 
+  describe "PUT #withdraw" do
+    context "with valid params" do
+
+    end
+
+    context "with valid params" do
+
+    end
+  end
+
+
+  describe "PUT deposit" do
+    context "with valid params" do
+
+    end
+
+    context "with valid params" do
+
+    end
+  end
+
   # describe "PUT #update" do
   #   context "with valid params" do
   #     let(:new_attributes) {
