@@ -11,6 +11,7 @@ class Account < ApplicationRecord
   # TODO:
   #   - check limit
   #   - check amount
+  #   - create transaction record
   def withdraw! amount
     self.balance += amount.to_f
     save!

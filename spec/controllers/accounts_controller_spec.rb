@@ -87,7 +87,7 @@ RSpec.describe AccountsController, type: :controller do
 
   describe "PUT #withdraw" do
     let(:account) {
-      post :create, params: {account: valid_attributes}
+      post :create, params: { account: valid_attributes }
       Account.last
     }
 
@@ -103,18 +103,31 @@ RSpec.describe AccountsController, type: :controller do
       end
     end
 
-    context "with valid params" do
+    context "with invalid params" do
 
     end
   end
 
 
   describe "PUT deposit" do
-    context "with valid params" do
+    let(:account) {
+      post :create, params: { account: valid_attributes }
+      Account.last
+    }
 
+    context "with valid params" do
+      it "update balance" do
+        balance = account.balance
+        amount = 50.00
+        post :deposit, params: { id: account.id, amount: amount }
+        expect(response).to have_http_status(:ok)
+        expect(response.content_type).to eq('application/json')
+        json = JSON.parse(response.body)
+        expect(json["balance"].to_f).to eq(balance - amount)
+      end
     end
 
-    context "with valid params" do
+    context "with invalid params" do
 
     end
   end
