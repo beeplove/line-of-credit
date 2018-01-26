@@ -61,6 +61,7 @@ RSpec.describe AccountsController, type: :controller do
   describe "POST #create" do
     context "with valid params" do
       it "creates a new Account" do
+
         expect {
           post :create, params: {account: valid_attributes}
         }.to change(Account, :count).by(1)
@@ -93,6 +94,7 @@ RSpec.describe AccountsController, type: :controller do
 
     context "with valid params" do
       it "update balance" do
+
         balance = account.balance
         amount = 100.00
         post :withdraw, params: { id: account.id, amount: amount }
@@ -103,6 +105,7 @@ RSpec.describe AccountsController, type: :controller do
       end
 
       it "create transaction record" do
+
         expect {
           post :withdraw, params: { id: account.id, amount: 100.00 }
         }.to change(Transaction, :count).by(1)
@@ -114,7 +117,6 @@ RSpec.describe AccountsController, type: :controller do
     end
   end
 
-
   describe "PUT deposit" do
     let(:account) {
       post :create, params: { account: valid_attributes }
@@ -122,6 +124,7 @@ RSpec.describe AccountsController, type: :controller do
     }
 
     context "with valid params" do
+
       it "update balance" do
         balance = account.balance
         amount = 50.00
@@ -134,6 +137,7 @@ RSpec.describe AccountsController, type: :controller do
       end
 
       it "create transaction record" do
+
         expect {
           post :deposit, params: { id: account.id, amount: 50.00 }
         }.to change(Transaction, :count).by(1)
