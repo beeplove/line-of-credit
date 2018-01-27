@@ -160,13 +160,14 @@ RSpec.describe AccountsController, type: :controller do
         account.ledgers[0].created_at = now - 40.days
         account.ledgers.each { |ledger| ledger.save }
 
-
         get :statement, params: { id: account.id }
 
         expect(response).to have_http_status(:ok)
         expect(response.content_type).to eq('application/json')
         json = JSON.parse(response.body)
+        expect(json["balance"].to_f).to eq(500.00)
         expect(json["interest"].to_f).to eq(14.38)
+        expect(json["payoff_amount"].to_f).to eq(514.38)
       end
     end
 

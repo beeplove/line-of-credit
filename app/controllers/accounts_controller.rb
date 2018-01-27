@@ -1,5 +1,5 @@
 class AccountsController < ApplicationController
-  before_action :set_account, only: [:show, :update, :destroy, :withdraw, :deposit]
+  before_action :set_account, only: [:show, :update, :destroy, :withdraw, :deposit, :statement]
 
   # GET /accounts
   def index
@@ -54,6 +54,19 @@ class AccountsController < ApplicationController
       render json: @account.errors, status: :unprocessable_entity
     end
   end
+
+  # Last closing statement on a give date
+  # GET /accounts/1/statement
+  # params
+  #   - date: default: current time
+  def statement
+    if statement = @account.statement(params[:date])
+      render json: statement, status: :ok
+    else
+      render json: @account.errors, status: :unprocessable_entity
+    end
+  end
+
 
   # DELETE /accounts/1
   def destroy

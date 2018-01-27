@@ -39,7 +39,7 @@ class Account < ApplicationRecord
     end
   end
 
-  # TODO: Accept any date like param and convert to midnight
+  # TODO: Accept any date like param and convert to end_of_day
   def outstanding_principal time=Time.now
     time = time.end_of_day if time.class == Time
 
@@ -51,7 +51,7 @@ class Account < ApplicationRecord
     ledger.balance
   end
 
-  # TODO: Accept any date like param and convert to midnight
+  # TODO: Accept any date like param and convert to end_of_day
   def accumulated_interest time=Time.now
     time = time.end_of_day if time.class == Time
 
@@ -80,10 +80,26 @@ class Account < ApplicationRecord
   end
   private :full_days_between_date
 
+  #
+  # TODO: Verify the following assumption
+  # Account statement period starts on every 30 days as of time account was created
+  #
+  # on a given day return the statement ending time, for example: if account was created on 1st july, on 5th august 
+  # ending_statement_time should return 30th july
+  #
+  def ending_statement_time time=Time.now
+     (self.created_at + (((time - self.created_at)/30.days).floor * STATEMENT_PERIOD)).end_of_day
+  end
+  private :ending_statement_time
+
+  # TODO: Accept any date like param
   def statement time=Time.now
-    time = time.end_of_day if time.class == Time
+    time = Time.now if time.nil?
+    time = ending_statement_time(time)if time.class == Time
     json = {}
-    json["balance"] = outstanding_principal
+    json["balance"] = outstanding_principal(time)
+    json["interest"] = accumulated_interest(time)
+    json["payoff_amount"] = json["balance"] + json["interest"]
 
     json
   end
