@@ -37,4 +37,19 @@ RSpec.describe Account, type: :model do
       end
     end
   end
+
+  describe "#accumulated_interest" do
+      let(:now) { Time.now }
+      let(:account) {
+        a = Account.create(apr: 35.00, limit: 1000, created_at: now - 30.days)
+        a.withdraw!(500.00)
+        a.ledgers[0].created_at = now - 30.days
+        a.ledgers.each { |ledger| ledger.save }
+        a
+      }
+
+    it "should calculate interest for each day for the outstanding principal of last 30 days" do
+      expect(account.accumulated_interest).to eq(14.38)
+    end
+  end
 end
