@@ -53,7 +53,7 @@ class Account < ApplicationRecord
 
   # TODO:
   #   - Accept any date like param and convert to end_of_day
-  #   - Verify the assumptioin that interest is calculated for full days, and not charged for
+  #   - Verify the assumption that interest is calculated for full days, and not charged for
   #     franctional day.
   #
   def accumulated_interest time=Time.now
