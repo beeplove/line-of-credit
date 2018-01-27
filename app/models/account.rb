@@ -7,7 +7,9 @@ class Account < ApplicationRecord
 
   has_many :ledgers
 
-  # TODO: check if we want to set a maximum in one transaction
+  STATEMENT_PERIOD = 30.days
+
+  # TODO: check if we want to set a maximum amount in one transaction
 
   #
   # TODO: (for withdraw! and deposit!)
@@ -43,9 +45,35 @@ class Account < ApplicationRecord
 
     return self.balance if self.ledgers.empty?
 
-    last = self.ledgers.where("created_at < ?", time).order("id DESC").limit(1).first
-    return self.balance if last.nil?
+    ledger = ledgers.where("created_at < ?", time).order("id DESC").limit(1).first
+    return self.balance if ledger.nil?
 
-    last.balance
+    ledger.balance
   end
+
+  # TODO: Accept any date like param and convert to midnight
+  def accumulated_interest time=Time.now
+    time = time.midnight if time.class == Time
+    previous_time = time - STATEMENT_PERIOD
+    previous_balance = outstanding_principal(previous_time)
+    ledgers = Ledger.for_account_in_statement_period(id, time - STATEMENT_PERIOD, time)
+    interest = 0
+
+    ledgers.each_with_index do |ledger, i|
+      days = (ledger.created_at - previous_time)/1.day
+      interest += interest_per_day_per_dollar * days * previous_balance
+
+      previous_balance = ledger.balance
+      previous_time = ledger.created_at
+    end
+
+    interest += interest_per_day_per_dollar * ((time - previous_time)/1.day) * previous_balance
+
+    interest.round(2)
+  end
+
+  def interest_per_day_per_dollar
+    (self.apr/100)/365
+  end
+  private :interest_per_day_per_dollar
 end
