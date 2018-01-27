@@ -10,10 +10,7 @@ RSpec.describe Account, type: :model do
 
   describe "#outstanding_principal" do
     context "brand new account" do
-      let(:now) { Time.now }
-      let(:account) {
-        a = Account.create(apr: 35.00, limit: 1000)
-      }
+      let(:account) { create(:account) }
 
       it "should return 0" do
         expect(account.outstanding_principal).to eq(0)
