@@ -150,6 +150,31 @@ RSpec.describe AccountsController, type: :controller do
   end
 
 
+  describe "GET statement" do
+    context "without date param after 30 days of account creation" do
+      let(:now) { Time.now }
+      let(:account) { Account.create(apr: 35.00, limit: 1000, created_at: now - 40.days) }
+
+      it "statement" do
+        account.withdraw!(500.00)
+        account.ledgers[0].created_at = now - 40.days
+        account.ledgers.each { |ledger| ledger.save }
+
+
+        get :statement, params: { id: account.id }
+
+        expect(response).to have_http_status(:ok)
+        expect(response.content_type).to eq('application/json')
+        json = JSON.parse(response.body)
+        expect(json["interest"].to_f).to eq(14.38)
+      end
+    end
+
+    context "with date param" do
+
+    end
+  end
+
   # describe "PUT #update" do
   #   context "with valid params" do
   #     let(:new_attributes) {
