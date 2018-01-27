@@ -101,7 +101,7 @@ RSpec.describe AccountsController, type: :controller do
         expect(response).to have_http_status(:ok)
         expect(response.content_type).to eq('application/json')
         json = JSON.parse(response.body)
-        expect(json["balance"].to_f).to eq(balance + amount)
+        expect(json["balance"].to_f).to eq(100.00)
       end
 
       it "creates additional record in ledger" do
@@ -148,6 +148,7 @@ RSpec.describe AccountsController, type: :controller do
 
     end
   end
+
 
   # describe "PUT #update" do
   #   context "with valid params" do
