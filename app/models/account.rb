@@ -51,7 +51,11 @@ class Account < ApplicationRecord
     ledger.balance
   end
 
-  # TODO: Accept any date like param and convert to end_of_day
+  # TODO:
+  #   - Accept any date like param and convert to end_of_day
+  #   - Verify the assumptioin that interest is calculated for full days, and not charged for
+  #     franctional day.
+  #
   def accumulated_interest time=Time.now
     time = time.end_of_day if time.class == Time
 
