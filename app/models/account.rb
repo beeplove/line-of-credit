@@ -47,8 +47,5 @@ class Account < ApplicationRecord
     return self.balance if last.nil?
 
     last.balance
-
-    # SELECT * FROM ledgers WHERE account_id=#{id} AND created_at < #{time} ORDER BY id DESC LIMIT 1
-
   end
 end

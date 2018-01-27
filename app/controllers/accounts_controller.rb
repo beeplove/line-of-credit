@@ -34,6 +34,8 @@ class AccountsController < ApplicationController
   end
 
   # PUT /accounts/1/withdraw
+  # params:
+  #   amount: amount to withdraw from account
   def withdraw
     if @account.withdraw!(params[:amount])
       render json: @account, status: :ok
@@ -43,6 +45,8 @@ class AccountsController < ApplicationController
   end
 
   # PUT /accounts/1/deposit
+  # params:
+  #   amount: amount to deposit to account
   def deposit
     if @account.deposit!(params[:amount])
       render json: @account, status: :ok
