@@ -41,11 +41,11 @@ class Account < ApplicationRecord
 
   # TODO: Accept any date like param and convert to midnight
   def outstanding_principal time=Time.now
-    time = time.midnight if time.class == Time
+    time = time.end_of_day if time.class == Time
 
     return self.balance if self.ledgers.empty?
 
-    ledger = ledgers.where("created_at < ?", time).order("id DESC").limit(1).first
+    ledger = ledgers.where("created_at <= ?", time).order("id DESC").limit(1).first
     return self.balance if ledger.nil?
 
     ledger.balance
@@ -53,23 +53,39 @@ class Account < ApplicationRecord
 
   # TODO: Accept any date like param and convert to midnight
   def accumulated_interest time=Time.now
-    time = time.midnight if time.class == Time
-    previous_time = time - STATEMENT_PERIOD
-    previous_balance = outstanding_principal(previous_time)
-    ledgers = Ledger.for_account_in_statement_period(id, time - STATEMENT_PERIOD, time)
-    interest = 0
+    time = time.end_of_day if time.class == Time
+
+    # Timestamp and balance at the beginning to statement period
+    previous_time     = (time - STATEMENT_PERIOD).beginning_of_day
+    previous_balance  = outstanding_principal(previous_time)
+
+    interest  = 0
+    ledgers   = Ledger.for_account_in_statement_period(id, previous_time, time)
 
     ledgers.each_with_index do |ledger, i|
-      days = (ledger.created_at - previous_time)/1.day
+      days      = full_days_between_date(ledger.created_at,  previous_time)
       interest += interest_per_day_per_dollar * days * previous_balance
 
-      previous_balance = ledger.balance
-      previous_time = ledger.created_at
+      previous_balance  = ledger.balance
+      previous_time     = ledger.created_at
     end
 
-    interest += interest_per_day_per_dollar * ((time - previous_time)/1.day) * previous_balance
+    interest += interest_per_day_per_dollar * full_days_between_date(time, previous_time) * previous_balance
 
     interest.round(2)
+  end
+
+  def full_days_between_date beginning, ending
+    ((ending - beginning)/1.day).abs.floor
+  end
+  private :full_days_between_date
+
+  def statement time=Time.now
+    time = time.end_of_day if time.class == Time
+    json = {}
+    json["balance"] = outstanding_principal
+
+    json
   end
 
   def interest_per_day_per_dollar
