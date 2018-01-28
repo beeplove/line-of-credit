@@ -1,6 +1,5 @@
 class AccountsController < ApplicationController
   before_action :set_account, only: [:show, :update, :destroy, :withdraw, :deposit, :statement]
-
   # GET /accounts
   def index
     @accounts = Account.all
@@ -42,6 +41,8 @@ class AccountsController < ApplicationController
     else
       render json: @account.errors, status: :unprocessable_entity
     end
+  rescue AccountError::InvalidTransactionAmountError
+    render json: @account.errors, status: :unprocessable_entity
   end
 
   # PUT /accounts/1/deposit
@@ -53,6 +54,8 @@ class AccountsController < ApplicationController
     else
       render json: @account.errors, status: :unprocessable_entity
     end
+  rescue AccountError::InvalidTransactionAmountError
+    render json: @account.errors, status: :unprocessable_entity
   end
 
   # Last closing statement on a give date

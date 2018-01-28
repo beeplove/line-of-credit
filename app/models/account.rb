@@ -18,6 +18,8 @@ class Account < ApplicationRecord
   #   - refactor to remove duplicate code
   #
   def withdraw! amount
+    raise ApiExceptions::AccountError::InvalidTransactionAmountError.new("transaction amount is invalid") if amount.to_f <= 0
+
     amount = amount.to_f
     self.balance += amount
     ledger = Ledger.new(account_id: self.id, entry_type: :withdraw, amount: amount, balance: self.balance)
@@ -29,6 +31,8 @@ class Account < ApplicationRecord
   end
 
   def deposit! amount
+    raise ApiExceptions::AccountError::InvalidTransactionAmountError.new("transaction amount is invalid") if amount.to_f <= 0
+
     amount = amount.to_f
     self.balance -= amount
     ledger = Ledger.new(account_id: self.id, entry_type: :deposit, amount: amount, balance: self.balance)
