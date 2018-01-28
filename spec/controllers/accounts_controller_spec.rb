@@ -118,6 +118,13 @@ RSpec.describe AccountsController, type: :controller do
         expect(response).to have_http_status(:unprocessable_entity)
       end
 
+      it "renders a JSON object with errors when try to withdraw too much" do
+        post :withdraw, params: { id: account.id, amount: '2000.00' }
+
+        expect(response.content_type).to eq('application/json')
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+
     end
   end
 
@@ -209,8 +216,6 @@ RSpec.describe AccountsController, type: :controller do
         expect(json["balance"].to_f).to eq(200.00)
         expect(json["interest"].to_f).to eq(7.67)
         expect(json["payoff_amount"].to_f).to eq(207.67)
-
-        # TODO: Add few more transaction in 2nd statement period
       end
     end
   end

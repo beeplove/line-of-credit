@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  resources :accounts, only: [:create, :show] do
+  resources :accounts, only: [:index, :create, :show] do
     member do
       put :deposit
       put :withdraw

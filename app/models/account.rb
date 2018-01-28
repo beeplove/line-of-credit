@@ -11,10 +11,6 @@ class Account < ApplicationRecord
 
   # TODO: check if we want to set a maximum amount in one transaction
 
-  #
-  # TODO: (for withdraw! and deposit!)
-  #   - Verify assumption: only allow withdraw as long as under limit
-  #
   def withdraw! amount
     raise ApiExceptions::AccountError::InvalidTransactionAmountError.new("transaction amount is invalid") if amount.to_f <= 0
 
@@ -88,7 +84,7 @@ class Account < ApplicationRecord
 
   #
   # TODO: Verify the following assumption
-  # Account statement period starts on every 30 days as of time account was created
+  #   - Account statement period starts on every 30 days as of time account was created
   #
   # on a given day return the statement ending time, for example: if account was created on 1st july, on 5th august 
   # ending_statement_time should return 30th july
