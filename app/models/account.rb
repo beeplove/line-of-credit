@@ -15,19 +15,14 @@ class Account < ApplicationRecord
   # TODO: (for withdraw! and deposit!)
   #   - check amount
   #   - check limit before update balance
-  #   - refactor to remove duplicate code
   #
   def withdraw! amount
     raise ApiExceptions::AccountError::InvalidTransactionAmountError.new("transaction amount is invalid") if amount.to_f <= 0
 
     amount = amount.to_f
     self.balance += amount
-    ledger = Ledger.new(account_id: self.id, entry_type: :withdraw, amount: amount, balance: self.balance)
-
-    ActiveRecord::Base.transaction do
-      ledger.save!
-      save!
-    end
+    ledgers << Ledger.new(account_id: self.id, entry_type: :withdraw, amount: amount, balance: self.balance)
+    save!
   end
 
   def deposit! amount
@@ -35,12 +30,8 @@ class Account < ApplicationRecord
 
     amount = amount.to_f
     self.balance -= amount
-    ledger = Ledger.new(account_id: self.id, entry_type: :deposit, amount: amount, balance: self.balance)
-
-    ActiveRecord::Base.transaction do
-      ledger.save!
-      save!
-    end
+    ledgers << Ledger.new(account_id: self.id, entry_type: :deposit, amount: amount, balance: self.balance)
+    save!
   end
 
   # TODO: Accept any date like param and convert to end_of_day to extend the functionality of this method
