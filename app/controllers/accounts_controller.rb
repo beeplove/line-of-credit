@@ -62,7 +62,7 @@ class AccountsController < ApplicationController
     render json: @account.errors, status: :unprocessable_entity
   rescue AccountError::AccountLimitError
     render json: @account.errors, status: :unprocessable_entity
-  rescue #something went wrong
+  rescue
     render json: @account.errors, status: :unprocessable_entity
   end
 
@@ -77,7 +77,7 @@ class AccountsController < ApplicationController
     end
   rescue AccountError::InvalidTransactionAmountError
     render json: @account.errors, status: :unprocessable_entity
-  rescue #something went wrong
+  rescue
     render json: @account.errors, status: :unprocessable_entity
   end
 
