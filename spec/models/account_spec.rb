@@ -45,32 +45,37 @@ RSpec.describe Account, type: :model do
 
   describe "#accumulated_interest" do
     context "with one withdraw" do
-      let(:now) { Time.now }
-      let(:account) { Account.create(apr: 35.00, limit: 1000, created_at: now - 30.days) }
+      let(:account) {
+        travel_to 30.days.ago
+        account = create(:account)
+        account.withdraw!(500.00)
+
+        travel_back
+        account
+      }
 
       it "should calculate interest for each day for the outstanding principal of last 30 days" do
-        account.withdraw!(500.00)
-        account.ledgers[0].created_at = now - 30.days
-        account.ledgers.each { |ledger| ledger.save }
-
         expect(account.accumulated_interest).to eq(14.38)
       end
     end
 
     context "with multiple transactions" do
-      let(:now) { Time.now }
-      let(:account) { Account.create(apr: 35.00, limit: 1000, created_at: now - 30.days) }
+      let(:account) {
+        travel_to 30.days.ago
+        account = create(:account)
+        account.withdraw!(500.00)
+
+        travel_to 15.days.after
+        account.deposit!(200.00)
+
+        travel_to 10.days.after
+        account.withdraw!(100.00)
+
+        travel_back
+        account
+      }
 
       it "should consider withdraw and deposit both to calculate interest" do
-        account.withdraw!(500.00)
-        account.deposit!(200.00)
-        account.withdraw!(100.00)
-        account.ledgers[0].created_at = now - 30.days
-        account.ledgers[1].created_at = now - 15.days
-        account.ledgers[2].created_at = now - 5.days
-
-        account.ledgers.each { |ledger| ledger.save }
-
         expect(account.accumulated_interest).to eq(11.99)        
       end
     end
