@@ -13,7 +13,6 @@ class Account < ApplicationRecord
 
   #
   # TODO: (for withdraw! and deposit!)
-  #   - check amount
   #   - check limit before update balance
   #
   def withdraw! amount

@@ -3,9 +3,35 @@ require 'rails_helper'
 RSpec.describe Account, type: :model do
 
   describe "#withdraw" do
+    let(:account) { create(:account) }
+
+    context "with valid amount" do
+      it "should withdraw successfully" do
+        expect{ account.withdraw!(50.00)}.to_not raise_error
+      end
+    end
+
+    context "with invalid amount" do
+      it "should raise error when try to withdraw a negative amount" do
+        expect{ account.withdraw!(-50.00)}.to raise_error(ApiExceptions::AccountError::InvalidTransactionAmountError)
+      end
+    end
   end
 
   describe "#deposit" do
+    let(:account) { create(:account) }
+
+    context "with valid amount" do
+      it "should deposit successfully" do
+        expect{ account.deposit!(50.00)}.to_not raise_error
+      end
+    end
+
+    context "with invalid amount" do
+      it "should raise error when try to deposit a negative amount" do
+        expect{ account.deposit!(-50.00)}.to raise_error(ApiExceptions::AccountError::InvalidTransactionAmountError)
+      end
+    end
   end
 
   describe "#outstanding_principal" do
