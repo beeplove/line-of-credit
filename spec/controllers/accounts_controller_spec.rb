@@ -148,7 +148,12 @@ RSpec.describe AccountsController, type: :controller do
     end
 
     context "with invalid params" do
+      it "renders a JSON object with errors when amount is not a number" do
+        post :deposit, params: { id: account.id, amount: 'fifty dollars' }
 
+        expect(response.content_type).to eq('application/json')
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
     end
   end
 
