@@ -94,9 +94,8 @@ RSpec.describe AccountsController, type: :controller do
     context "with valid params" do
       it "update balance" do
 
-        balance = account.balance
-        amount = 100.00
-        post :withdraw, params: { id: account.id, amount: amount }
+        post :withdraw, params: { id: account.id, amount: 100.00 }
+
         expect(response).to have_http_status(:ok)
         expect(response.content_type).to eq('application/json')
         json = JSON.parse(response.body)
@@ -112,6 +111,12 @@ RSpec.describe AccountsController, type: :controller do
     end
 
     context "with invalid params" do
+      it "renders a JSON object with errors when amount is not a number" do
+        post :withdraw, params: { id: account.id, amount: 'ten dollars' }
+
+        expect(response.content_type).to eq('application/json')
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
 
     end
   end
