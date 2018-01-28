@@ -91,7 +91,9 @@ class AccountsController < ApplicationController
     else
       render json: @account.errors, status: :unprocessable_entity
     end
-  rescue #something went wrong
+  rescue ApiExceptions::AccountError::InvalidStatementDateError
+    render json: @account.errors, status: :unprocessable_entity
+  rescue
     render json: @account.errors, status: :unprocessable_entity
   end
 

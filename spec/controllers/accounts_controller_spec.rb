@@ -182,11 +182,36 @@ RSpec.describe AccountsController, type: :controller do
     end
 
     context "with date param for account with long history of transactions" do
+      let(:now) { Time.current }
       let(:account) {
+        travel_to now.ago(100.days)
+        account = create(:account)
 
+        travel_to 5.days.after
+        account.withdraw!(100.00)
+
+        travel_to 10.days.after
+        account.withdraw!(600.00)
+
+        travel_to 8.days.after
+        account.deposit!(500.00)
+
+        travel_back
+        account
       }
 
-      it "returan statement summary on any given date"
+      it "returan statement summary on any given date" do
+        get :statement, params: { id: account.id, date: now.ago(69.days).strftime("%Y-%m-%d") }
+
+        expect(response).to have_http_status(:ok)
+        expect(response.content_type).to eq('application/json')
+        json = JSON.parse(response.body)
+        expect(json["balance"].to_f).to eq(200.00)
+        expect(json["interest"].to_f).to eq(7.67)
+        expect(json["payoff_amount"].to_f).to eq(207.67)
+
+        # TODO: Add few more transaction in 2nd statement period
+      end
     end
   end
 

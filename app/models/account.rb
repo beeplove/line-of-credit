@@ -98,10 +98,21 @@ class Account < ApplicationRecord
   end
   private :ending_statement_time
 
-  # TODO: Accept any date like param
   def statement time=Time.current
-    time = Time.current if time.nil?
-    time = ending_statement_time(time)if time.class == Time
+    time = Time.current if time.blank?
+
+    if time.class == String
+      begin
+        time = Time.parse(time)
+      rescue ArgumentError
+        raise ApiExceptions::AccountError::InvalidStatementDateError.new("statement date is not valid")
+      rescue
+        raise
+      end
+    end
+
+    time = ending_statement_time(time)
+
     json = {}
     json["balance"] = outstanding_principal(time)
     json["interest"] = accumulated_interest(time)

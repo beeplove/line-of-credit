@@ -5,5 +5,9 @@ module ApiExceptions
 
     class AccountLimitError < ApiExceptions::AccountError
     end
+
+    class InvalidStatementDateError < ApiExceptions::AccountError
+    end
+
   end
 end
