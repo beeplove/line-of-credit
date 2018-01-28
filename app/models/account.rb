@@ -22,18 +22,27 @@ class Account < ApplicationRecord
     self.balance += amount
     raise ApiExceptions::AccountError::AccountLimitError.new("transactiona amount is too high") if self.balance > self.limit
 
-    ledgers << Ledger.new(account_id: self.id, entry_type: :withdraw, amount: amount, balance: self.balance)
-    save!
+    ledger = Ledger.new(account_id: self.id, entry_type: :withdraw, amount: amount, balance: self.balance)
+    save_ledger_and_save(ledger)
   end
 
+  # TODO: Check if negative balance is allowed because of high payment
   def deposit! amount
     raise ApiExceptions::AccountError::InvalidTransactionAmountError.new("transaction amount is invalid") if amount.to_f <= 0
 
     amount = amount.to_f
     self.balance -= amount
-    ledgers << Ledger.new(account_id: self.id, entry_type: :deposit, amount: amount, balance: self.balance)
-    save!
+    ledger = Ledger.new(account_id: self.id, entry_type: :deposit, amount: amount, balance: self.balance)
+    save_ledger_and_save(ledger)
   end
+
+  def save_ledger_and_save ledger
+    ActiveRecord::Base.transaction do
+      ledgers << ledger
+      save!
+    end
+  end
+  private :save_ledger_and_save
 
   # TODO: Accept any date like param and convert to end_of_day to extend the functionality of this method
   def outstanding_principal time=Time.current
@@ -46,9 +55,8 @@ class Account < ApplicationRecord
   end
 
   # TODO:
-  #   - Accept any date like param and convert to end_of_day
-  #   - Verify the assumption that interest is calculated for full days, and not charged for
-  #     franctional day.
+  #   - Accept any date like param and convert to end_of_day to extend the functionality of this method
+  #   - Verify the assumption that interest is calculated for full days, and not charged for franctional day.
   #
   def accumulated_interest time=Time.current
     time = time.end_of_day if time.class == Time
