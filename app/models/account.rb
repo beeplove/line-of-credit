@@ -39,16 +39,14 @@ class Account < ApplicationRecord
     end
   end
 
-  # TODO: Accept any date like param and convert to end_of_day
-  def outstanding_principal time=Time.now
+  # TODO: Accept any date like param and convert to end_of_day to extend the functionality of this method
+  def outstanding_principal time=Time.current
     time = time.end_of_day if time.class == Time
 
-    return self.balance if self.ledgers.empty?
-
     ledger = ledgers.where("created_at <= ?", time).order("id DESC").limit(1).first
-    return self.balance if ledger.nil?
+    return 0 if ledger.nil?
 
-    ledger.balance
+    ledger.balance.round(2)
   end
 
   # TODO:
@@ -56,7 +54,7 @@ class Account < ApplicationRecord
   #   - Verify the assumption that interest is calculated for full days, and not charged for
   #     franctional day.
   #
-  def accumulated_interest time=Time.now
+  def accumulated_interest time=Time.current
     time = time.end_of_day if time.class == Time
 
     # Timestamp and balance at the beginning to statement period
@@ -91,14 +89,14 @@ class Account < ApplicationRecord
   # on a given day return the statement ending time, for example: if account was created on 1st july, on 5th august 
   # ending_statement_time should return 30th july
   #
-  def ending_statement_time time=Time.now
+  def ending_statement_time time=Time.current
      (self.created_at + (((time - self.created_at)/30.days).floor * STATEMENT_PERIOD)).end_of_day
   end
   private :ending_statement_time
 
   # TODO: Accept any date like param
-  def statement time=Time.now
-    time = Time.now if time.nil?
+  def statement time=Time.current
+    time = Time.current if time.nil?
     time = ending_statement_time(time)if time.class == Time
     json = {}
     json["balance"] = outstanding_principal(time)

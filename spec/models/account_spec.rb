@@ -1,6 +1,8 @@
 require 'rails_helper'
 
+
 RSpec.describe Account, type: :model do
+  include ActiveSupport::Testing::TimeHelpers
 
   describe "#withdraw" do
   end
@@ -10,7 +12,12 @@ RSpec.describe Account, type: :model do
 
   describe "#outstanding_principal" do
     context "brand new account" do
-      let(:account) { create(:account) }
+      let(:account) {
+        travel_to 30.days.ago
+        account = create(:account)
+        travel_back
+        account
+      }
 
       it "should return 0" do
         expect(account.outstanding_principal).to eq(0)
@@ -18,19 +25,22 @@ RSpec.describe Account, type: :model do
     end
 
     context "account with ledgers" do
-      let(:now) { Time.now }
       let(:account) {
-        a = Account.create(apr: 35.00, limit: 1000, created_at: now - 30.days)
-        a.withdraw!(500.00)
-        a.deposit!(200.00)
-        a.ledgers[0].created_at = now - 15.days
-        a.ledgers[1].created_at = now - 10.days
-        a.ledgers.each { |ledger| ledger.save }
-        a
+        travel_to 30.days.ago
+        account = create(:account)
+        travel_to 15.days.after
+        account.withdraw!(500.00)
+        travel_to 5.days.after
+        account.deposit!(200.00)
+        travel_back
+        account
       }
 
       it "should return outstanding principal for a given day" do
-        expect(account.outstanding_principal(now - 25.days)).to eq(300.00)
+        expect(account.outstanding_principal(25.days.ago)).to eq(0)
+        expect(account.outstanding_principal(15.days.ago)).to eq(500.00)
+        expect(account.outstanding_principal(5.days.ago)).to eq(300.00)
+        expect(account.outstanding_principal).to eq(300.00)
       end
     end
   end
