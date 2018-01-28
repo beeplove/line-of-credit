@@ -90,7 +90,7 @@ class Account < ApplicationRecord
   # ending_statement_time should return 30th july
   #
   def ending_statement_time time=Time.current
-     (self.created_at + (((time - self.created_at)/30.days).floor * STATEMENT_PERIOD)).end_of_day
+     (self.created_at + (((time - self.created_at)/STATEMENT_PERIOD).floor * STATEMENT_PERIOD)).end_of_day
   end
   private :ending_statement_time
 
