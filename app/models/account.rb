@@ -13,13 +13,15 @@ class Account < ApplicationRecord
 
   #
   # TODO: (for withdraw! and deposit!)
-  #   - check limit before update balance
+  #   - Verify assumption: only allow withdraw as long as under limit
   #
   def withdraw! amount
     raise ApiExceptions::AccountError::InvalidTransactionAmountError.new("transaction amount is invalid") if amount.to_f <= 0
 
     amount = amount.to_f
     self.balance += amount
+    raise ApiExceptions::AccountError::AccountLimitError.new("transactiona amount is too high") if self.balance > self.limit
+
     ledgers << Ledger.new(account_id: self.id, entry_type: :withdraw, amount: amount, balance: self.balance)
     save!
   end

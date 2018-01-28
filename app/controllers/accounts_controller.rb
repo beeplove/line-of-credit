@@ -43,6 +43,8 @@ class AccountsController < ApplicationController
     end
   rescue AccountError::InvalidTransactionAmountError
     render json: @account.errors, status: :unprocessable_entity
+  rescue AccountError::AccountLimitError
+    render json: @account.errors, status: :unprocessable_entity
   end
 
   # PUT /accounts/1/deposit
