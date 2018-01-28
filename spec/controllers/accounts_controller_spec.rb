@@ -169,7 +169,7 @@ RSpec.describe AccountsController, type: :controller do
         account
       }
 
-      it "statement" do
+      it "returns statement summary" do
         get :statement, params: { id: account.id }
 
         expect(response).to have_http_status(:ok)
@@ -181,8 +181,12 @@ RSpec.describe AccountsController, type: :controller do
       end
     end
 
-    context "with date param" do
+    context "with date param for account with long history of transactions" do
+      let(:account) {
 
+      }
+
+      it "returan statement summary on any given date"
     end
   end
 
