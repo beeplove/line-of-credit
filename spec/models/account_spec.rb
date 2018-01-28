@@ -1,8 +1,6 @@
 require 'rails_helper'
 
-
 RSpec.describe Account, type: :model do
-  include ActiveSupport::Testing::TimeHelpers
 
   describe "#withdraw" do
   end
