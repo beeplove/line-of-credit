@@ -207,7 +207,7 @@ RSpec.describe AccountsController, type: :controller do
         account
       }
 
-      it "returan statement summary on any given date" do
+      it "returns statement summary on any given date" do
         get :statement, params: { id: account.id, date: now.ago(69.days).strftime("%Y-%m-%d") }
 
         expect(response).to have_http_status(:ok)
@@ -217,6 +217,10 @@ RSpec.describe AccountsController, type: :controller do
         expect(json["interest"].to_f).to eq(7.67)
         expect(json["payoff_amount"].to_f).to eq(207.67)
       end
+
+      # TODO: if not paid off the full balance, does interest adds up to the existing balance?
+      it "returns statement summary on any given date for end of second billing period"
+
     end
   end
 
