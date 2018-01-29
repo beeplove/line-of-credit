@@ -63,13 +63,13 @@ RSpec.describe AccountsController, type: :controller do
       it "creates a new Account" do
 
         expect {
-          post :create, params: {account: valid_attributes}
+          post :create, params: { account: valid_attributes }
         }.to change(Account, :count).by(1)
       end
 
       it "renders a JSON response with the new account" do
 
-        post :create, params: {account: valid_attributes}
+        post :create, params: { account: valid_attributes }
         expect(response).to have_http_status(:created)
         expect(response.content_type).to eq('application/json')
         expect(response.location).to eq(account_url(Account.last))
@@ -79,7 +79,7 @@ RSpec.describe AccountsController, type: :controller do
     context "with invalid params" do
       it "renders a JSON response with errors for the new account" do
 
-        post :create, params: {account: invalid_attributes}
+        post :create, params: { account: invalid_attributes }
         expect(response).to have_http_status(:unprocessable_entity)
         expect(response.content_type).to eq('application/json')
       end
