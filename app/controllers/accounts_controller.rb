@@ -1,19 +1,3 @@
-#
-# TODO: standarize json output
-# {
-#   "status": "success|error",
-#   "data": {
-#     "id": 1,
-#     "apr": 35.00,
-#     "limit": 1000
-#   },
-#   "error": {
-#     "message": "user friendly error message in 1-2 sentence(s)",
-#     "code": "application error code (need to maintain a database for error code",
-#     "description": "provide further details or a link where more details can be found"
-#   }
-# }
-#
 
 class AccountsController < ApplicationController
   before_action :set_account, only: [:show, :update, :destroy, :withdraw, :deposit, :statement]
@@ -21,12 +5,12 @@ class AccountsController < ApplicationController
   def index
     @accounts = Account.all
 
-    render json: @accounts
+    jsonator @accounts
   end
 
   # GET /accounts/1
   def show
-    render json: @account
+    jsonator @account
   end
 
   # POST /accounts
@@ -58,12 +42,6 @@ class AccountsController < ApplicationController
     else
       render json: @account.errors, status: :unprocessable_entity
     end
-  rescue AccountError::InvalidTransactionAmountError
-    render json: @account.errors, status: :unprocessable_entity
-  rescue AccountError::AccountLimitError
-    render json: @account.errors, status: :unprocessable_entity
-  rescue
-    render json: @account.errors, status: :unprocessable_entity
   end
 
   # PUT /accounts/1/deposit
@@ -75,10 +53,6 @@ class AccountsController < ApplicationController
     else
       render json: @account.errors, status: :unprocessable_entity
     end
-  rescue AccountError::InvalidTransactionAmountError
-    render json: @account.errors, status: :unprocessable_entity
-  rescue
-    render json: @account.errors, status: :unprocessable_entity
   end
 
   # Last closing statement on a give date
@@ -91,10 +65,6 @@ class AccountsController < ApplicationController
     else
       render json: @account.errors, status: :unprocessable_entity
     end
-  rescue ApiExceptions::AccountError::InvalidStatementDateError
-    render json: @account.errors, status: :unprocessable_entity
-  rescue
-    render json: @account.errors, status: :unprocessable_entity
   end
 
 
