@@ -42,7 +42,7 @@ class Account < ApplicationRecord
 
   # TODO: Accept any date like param and convert to end_of_day to extend the functionality of this method
   def outstanding_principal time=Time.current
-    time = time.end_of_day if time.class == Time
+    time = time.end_of_day if time.kind_of?(Time)
 
     ledger = ledgers.where("created_at <= ?", time).order("id DESC").limit(1).first
     return 0 if ledger.nil?
@@ -54,15 +54,15 @@ class Account < ApplicationRecord
   #   - Accept any date like param and convert to end_of_day to extend the functionality of this method
   #   - Verify the assumption that interest is calculated for full days, and not charged for franctional day.
   #
-  def accumulated_interest time=Time.current
-    time = time.end_of_day if time.class == Time
+  def accumulated_interest ending_time=Time.current, beginning_time=nil
+    ending_time = ending_time.end_of_day if ending_time.kind_of?(Time)
 
     # Timestamp and balance at the beginning to statement period
-    previous_time     = (time - STATEMENT_PERIOD).beginning_of_day
+    previous_time     = beginning_time || (ending_time - STATEMENT_PERIOD).beginning_of_day
     previous_balance  = outstanding_principal(previous_time)
 
     interest  = 0
-    ledgers   = Ledger.for_account_in_statement_period(id, previous_time, time)
+    ledgers   = Ledger.for_account_in_statement_period(id, previous_time, ending_time)
 
     ledgers.each_with_index do |ledger, i|
       days      = full_days_between_date(ledger.created_at,  previous_time)
@@ -72,7 +72,7 @@ class Account < ApplicationRecord
       previous_time     = ledger.created_at
     end
 
-    interest += interest_per_day_per_dollar * full_days_between_date(time, previous_time) * previous_balance
+    interest += interest_per_day_per_dollar * full_days_between_date(ending_time, previous_time) * previous_balance
 
     interest.round(2)
   end
@@ -90,9 +90,16 @@ class Account < ApplicationRecord
   # ending_statement_time should return 30th july
   #
   def ending_statement_time time=Time.current
-     (self.created_at + (((time - self.created_at)/STATEMENT_PERIOD).floor * STATEMENT_PERIOD)).end_of_day
+    (self.created_at + (((time - self.created_at)/STATEMENT_PERIOD).floor * STATEMENT_PERIOD)).end_of_day
   end
   private :ending_statement_time
+
+  def beginning_statement_time time=Time.current
+    ending_statement_time(time).ago(STATEMENT_PERIOD).beginning_of_day
+  end
+  private :beginning_statement_time
+
+
 
   def statement time=Time.current
     time = Time.current if time.blank?
@@ -107,11 +114,12 @@ class Account < ApplicationRecord
       end
     end
 
-    time = ending_statement_time(time)
+    ending_time = ending_statement_time(time)
+    beginning_time = beginning_statement_time(time)
 
     json = {}
-    json["balance"] = outstanding_principal(time)
-    json["interest"] = accumulated_interest(time)
+    json["balance"] = outstanding_principal(ending_time)
+    json["interest"] = accumulated_interest(ending_time, beginning_time)
     json["payoff_amount"] = json["balance"] + json["interest"]
 
     json

@@ -102,7 +102,7 @@ RSpec.describe Account, type: :model do
       }
 
       it "should consider withdraw and deposit both to calculate interest" do
-        expect(account.accumulated_interest).to eq(11.99)        
+        expect(account.accumulated_interest).to eq(11.99)
       end
     end
   end
